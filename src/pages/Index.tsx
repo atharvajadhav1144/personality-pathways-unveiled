@@ -1,14 +1,57 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import { useState } from 'react';
+import LandingPage from '@/components/LandingPage';
+import PersonalityTest from '@/components/PersonalityTest';
+import PersonalityResults from '@/components/PersonalityResults';
+
+type AppState = 'landing' | 'test' | 'results';
 
 const Index = () => {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
-    </div>
-  );
+  const [currentState, setCurrentState] = useState<AppState>('landing');
+  const [testResults, setTestResults] = useState<Record<string, number> | null>(null);
+
+  const handleStartTest = () => {
+    setCurrentState('test');
+  };
+
+  const handleTestComplete = (results: Record<string, number>) => {
+    setTestResults(results);
+    setCurrentState('results');
+  };
+
+  const handleRetakeTest = () => {
+    setTestResults(null);
+    setCurrentState('test');
+  };
+
+  const handleBackToHome = () => {
+    setCurrentState('landing');
+    setTestResults(null);
+  };
+
+  const handleBackToLanding = () => {
+    setCurrentState('landing');
+  };
+
+  switch (currentState) {
+    case 'test':
+      return (
+        <PersonalityTest 
+          onComplete={handleTestComplete} 
+          onBack={handleBackToLanding}
+        />
+      );
+    case 'results':
+      return testResults ? (
+        <PersonalityResults 
+          scores={testResults} 
+          onRetake={handleRetakeTest}
+          onBackToHome={handleBackToHome}
+        />
+      ) : null;
+    default:
+      return <LandingPage onStartTest={handleStartTest} />;
+  }
 };
 
 export default Index;
